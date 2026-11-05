@@ -4,7 +4,7 @@ Multi-tenant CRM for B2B teams, distributors, agencies and service businesses:
 accounts, contacts, lead intake, opportunities, outreach sequences, meetings,
 quotations, forecasting and sales handover. Each subscribing company is isolated.
 
-**Status: Phases 1–3 built (foundation, core CRM, leads and pipeline); Phases 4–9 not built.** See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md). Not yet production-ready: see "Before going live" below.
+**Status: foundation, core CRM, leads/pipeline, marketing site, plans and trials, Razorpay billing, Brevo email and platform admin are built; sequences, meetings, quotes, forecasting, import/export are not.** See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md). Not yet production-ready: see "Before going live" below.
 
 Proposed stack (same as the Tendwell project): Next.js, TypeScript, Supabase
 (Postgres, Auth, row-level security), Tailwind, Vitest.
@@ -46,3 +46,14 @@ CSV import/export, rate limiting on the public form, backups and monitoring.
 Deploy target: any Node 22 host (e.g. Vercel) plus a hosted Supabase project;
 apply `supabase/migrations/` with `supabase db push`, set the two
 `NEXT_PUBLIC_SUPABASE_*` variables, and turn on email confirmation in Supabase Auth.
+
+## SaaS layer (built, needs your keys to go live)
+- Marketing site: `/`, `/features`, `/pricing` (reads the `plans` table), `/demo`.
+- 14-day trial on Growth for every new workspace; seat limits per plan (open invitations hold a seat); `/w/<slug>/billing`.
+- Razorpay: checkout creates a subscription; webhook `POST /api/razorpay/webhook` verifies the signature and updates status idempotently. Create the 3 plans x 2 intervals in Razorpay and put their ids in `plans.razorpay_plan_monthly/yearly`.
+- Brevo: invitations are emailed when `BREVO_API_KEY` and `EMAIL_FROM_ADDRESS` are set (sender must be verified in Brevo); otherwise the link is shown.
+- `/admin`: platform staff only. Make the first one in SQL:
+  `insert into platform_staff (user_id, role) select id, 'owner' from profiles where email = 'you@example.com';`
+- Expiry: run "Suspend lapsed trials and unpaid workspaces" in `/admin` (schedule it daily once you have a job runner).
+- Plan prices are placeholders (Starter 1,499 / Growth 4,999 / Scale 12,999 per month); edit the `plans` table.
+- Unverified against live Razorpay/Brevo/Supabase: signature check, event parsing and all SQL are tested; the HTTP calls to Razorpay and Brevo are not.

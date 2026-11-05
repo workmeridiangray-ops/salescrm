@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyError } from "@/lib/rules/permissions";
+import { sendEmail } from "@/lib/email";
+import { invitationEmail } from "@/lib/email-templates";
 
 type Result = { error: { message: string } | null };
 
@@ -19,8 +21,14 @@ export async function invite(form: FormData) {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("invite_member", { p_tenant: s(form, "tenant"), p_email: s(form, "email"), p_role: s(form, "role") });
   if (error) return done(slug, { error });
-  // No email service yet (Phase 8): show the one-time link to the inviter.
-  await done(slug, { error: null }, `?invite=${encodeURIComponent(String(data))}`);
+  const link = `${(process.env.APP_URL ?? "").replace(/\/$/, "")}/invite/${data}`;
+  const [{ data: ws }, { data: { user } }] = await Promise.all([
+    supabase.from("tenants").select("name").eq("id", s(form, "tenant")).maybeSingle(), supabase.auth.getUser(),
+  ]);
+  const mail = invitationEmail({ workspace: ws?.name ?? "a workspace", inviter: user?.email ?? "A colleague", link });
+  const sent = await sendEmail({ to: s(form, "email").toLowerCase(), ...mail });
+  // Email not configured (or failed): show the one-time link to the inviter instead.
+  await done(slug, { error: null }, sent ? "?sent=1" : `?invite=${encodeURIComponent(String(data))}`);
 }
 
 export async function revokeInvitation(form: FormData) {

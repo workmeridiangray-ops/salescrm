@@ -6,7 +6,7 @@ import { changeRole, invite, removeMember, revokeInvitation, setStatus } from ".
 
 export const metadata: Metadata = { title: "Members" };
 
-export default async function Members({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ error?: string; invite?: string }> }) {
+export default async function Members({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ error?: string; invite?: string; sent?: string }> }) {
   const { slug } = await params;
   const sp = await searchParams;
   const { tenant, perms, user } = await requirePermission(slug, "members.view");
@@ -25,6 +25,7 @@ export default async function Members({ params, searchParams }: { params: Promis
     <section className="space-y-6">
       <h1 className="text-2xl font-semibold">Members</h1>
       {sp.error && <p role="alert" className="rounded border border-line bg-surface p-3 text-sm text-red-700">{sp.error}</p>}
+      {sp.sent && <p role="status" className="rounded border border-line bg-surface p-3 text-sm text-green-800">Invitation emailed.</p>}
       {sp.invite && (
         <p role="status" className="rounded border border-line bg-surface p-3 text-sm">
           Invitation created. Send this link to the person (it is shown only once and works for 7 days):

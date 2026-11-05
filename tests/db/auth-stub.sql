@@ -15,3 +15,6 @@ do $$ begin
 end $$;
 grant usage on schema public, auth to anon, authenticated;
 grant execute on function auth.uid() to anon, authenticated;
+do $$ begin
+  if not exists (select 1 from pg_roles where rolname = 'service_role') then create role service_role nologin; end if;
+end $$;

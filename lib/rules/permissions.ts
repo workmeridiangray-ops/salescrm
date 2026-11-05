@@ -14,6 +14,7 @@ export const PERMISSIONS = {
   "crm.write": "Create and edit records you own",
   "pipeline.configure": "Configure pipelines and stages",
   "crm.export": "Export records",
+  "billing.manage": "Manage the subscription and payment details",
 } as const;
 export type Permission = keyof typeof PERMISSIONS;
 export const ALL_PERMISSIONS = Object.keys(PERMISSIONS) as Permission[];
@@ -71,6 +72,10 @@ export const ERROR_TEXT: Record<string, string> = {
   lead_not_found: "That lead no longer exists.",
   lead_already_converted: "That lead was already converted.",
   lead_disqualified: "Disqualified leads can't be converted. Reopen the lead first.",
+  plan_limit_users: "Your plan's user limit is reached. Upgrade the plan to invite more people.",
+  reason_required: "Give a reason. It is recorded in the audit trail.",
+  workspace_not_found: "That workspace no longer exists.",
+  invalid_request: "Please check the details and try again.",
   invitation_not_pending: "That invitation is no longer pending.",
 };
 

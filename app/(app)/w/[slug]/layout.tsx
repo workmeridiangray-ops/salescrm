@@ -15,6 +15,7 @@ export default async function WorkspaceLayout({ children, params }: { children: 
     { href: `/w/${slug}`, label: "Overview", show: true },
     { href: `/w/${slug}/members`, label: "Members", show: can(perms, "members.view") },
     { href: `/w/${slug}/roles`, label: "Roles", show: can(perms, "roles.manage") || can(perms, "members.view") },
+    { href: `/w/${slug}/billing`, label: "Billing", show: can(perms, "billing.manage") },
     { href: `/w/${slug}/audit`, label: "Audit trail", show: can(perms, "audit.view") },
   ].filter((l) => l.show);
   return (
@@ -27,7 +28,15 @@ export default async function WorkspaceLayout({ children, params }: { children: 
         </div>
         {links.map((l) => <Link key={l.href} href={l.href} className="block rounded px-3 py-2 hover:bg-line/40">{l.label}</Link>)}
       </nav>
-      <div>{children}</div>
+      <div>
+        {tenant.status === "suspended" && (
+          <p role="alert" className="mb-4 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-900">
+            This workspace is suspended (trial ended, payment lapsed, or paused by support). Data is kept but changes are blocked.
+            {can(perms, "billing.manage") ? <> <Link className="underline" href={`/w/${slug}/billing`}>Open billing</Link></> : " Ask a workspace owner to resolve billing."}
+          </p>
+        )}
+        {children}
+      </div>
     </div>
   );
 }
