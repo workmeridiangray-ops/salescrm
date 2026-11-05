@@ -10,14 +10,18 @@ export const PERMISSIONS = {
   "roles.manage": "Create, edit and delete roles",
   "audit.view": "Read the audit trail",
   "tenant.configure": "Change workspace settings",
+  "crm.read_all": "See every account, contact, lead and opportunity in the workspace",
+  "crm.write": "Create and edit records you own",
+  "pipeline.configure": "Configure pipelines and stages",
+  "crm.export": "Export records",
 } as const;
 export type Permission = keyof typeof PERMISSIONS;
 export const ALL_PERMISSIONS = Object.keys(PERMISSIONS) as Permission[];
 
 export const SYSTEM_ROLES: Record<"owner" | "manager" | "staff", { name: string; permissions: Permission[] }> = {
   owner: { name: "Owner", permissions: [...ALL_PERMISSIONS].sort() },
-  manager: { name: "Manager", permissions: ["members.view", "members.invite", "audit.view"] },
-  staff: { name: "Staff", permissions: [] },
+  manager: { name: "Manager", permissions: ["audit.view", "crm.read_all", "crm.write", "members.invite", "members.view", "pipeline.configure"] },
+  staff: { name: "Staff", permissions: ["crm.write"] },
 };
 
 export const can = (held: readonly string[], p: Permission) => held.includes(p);
@@ -62,6 +66,11 @@ export const ERROR_TEXT: Record<string, string> = {
   invitation_expired: "This invitation has expired. Ask for a new one.",
   invitation_used: "This invitation has already been used.",
   workspace_suspended: "This workspace is suspended.",
+  owner_not_member: "The owner must be an active member of this workspace.",
+  loss_reason_required: "Say why the deal was lost.",
+  lead_not_found: "That lead no longer exists.",
+  lead_already_converted: "That lead was already converted.",
+  lead_disqualified: "Disqualified leads can't be converted. Reopen the lead first.",
   invitation_not_pending: "That invitation is no longer pending.",
 };
 
@@ -70,6 +79,9 @@ export function friendlyError(message: string | undefined): string {
   if (ERROR_TEXT[message]) return ERROR_TEXT[message]!;
   if (/duplicate key.*slug/.test(message)) return "That workspace address is taken.";
   if (/duplicate key.*\(tenant_id, key\)/.test(message)) return "A role with that key already exists.";
+  if (/accounts_name_unique/.test(message)) return "An account with that name already exists.";
+  if (/contacts_email_unique|leads_email_open/.test(message)) return "A record with that email already exists.";
+  if (/violates row-level security/.test(message)) return "You can only change records you own.";
   if (/tenants_slug_check/.test(message)) return "Use 3–40 lowercase letters, numbers or hyphens for the address.";
   return "Something went wrong. Please try again.";
 }

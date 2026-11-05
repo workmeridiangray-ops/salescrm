@@ -7,6 +7,11 @@ export default async function WorkspaceLayout({ children, params }: { children: 
   const { slug } = await params;
   const { tenant, role, perms } = await getWorkspace(slug);
   const links = [
+    { href: `/w/${slug}/today`, label: "Today", show: can(perms, "crm.write") },
+    { href: `/w/${slug}/leads`, label: "Leads", show: can(perms, "crm.write") || can(perms, "crm.read_all") },
+    { href: `/w/${slug}/accounts`, label: "Accounts", show: can(perms, "crm.write") || can(perms, "crm.read_all") },
+    { href: `/w/${slug}/contacts`, label: "Contacts", show: can(perms, "crm.write") || can(perms, "crm.read_all") },
+    { href: `/w/${slug}/pipeline`, label: "Pipeline", show: can(perms, "crm.write") || can(perms, "crm.read_all") },
     { href: `/w/${slug}`, label: "Overview", show: true },
     { href: `/w/${slug}/members`, label: "Members", show: can(perms, "members.view") },
     { href: `/w/${slug}/roles`, label: "Roles", show: can(perms, "roles.manage") || can(perms, "members.view") },

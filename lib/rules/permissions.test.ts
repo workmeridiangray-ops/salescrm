@@ -4,7 +4,7 @@ import { ALL_PERMISSIONS, SLUG_RE, SYSTEM_ROLES, can, friendlyError, holdsAll, i
 describe("permissions", () => {
   it("owner holds every permission; staff none; manager is a strict subset", () => {
     expect(SYSTEM_ROLES.owner.permissions).toEqual([...ALL_PERMISSIONS].sort());
-    expect(SYSTEM_ROLES.staff.permissions).toEqual([]);
+    expect(SYSTEM_ROLES.staff.permissions).toEqual(["crm.write"]);
     expect(holdsAll(SYSTEM_ROLES.owner.permissions, SYSTEM_ROLES.manager.permissions)).toBe(true);
     expect(holdsAll(SYSTEM_ROLES.manager.permissions, SYSTEM_ROLES.owner.permissions)).toBe(false);
   });

@@ -4,7 +4,7 @@ Multi-tenant CRM for B2B teams, distributors, agencies and service businesses:
 accounts, contacts, lead intake, opportunities, outreach sequences, meetings,
 quotations, forecasting and sales handover. Each subscribing company is isolated.
 
-**Status: planning.** See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md).
+**Status: Phases 1–3 built (foundation, core CRM, leads and pipeline); Phases 4–9 not built.** See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md). Not yet production-ready: see "Before going live" below.
 
 Proposed stack (same as the Tendwell project): Next.js, TypeScript, Supabase
 (Postgres, Auth, row-level security), Tailwind, Vitest.
@@ -29,3 +29,20 @@ Rules worth knowing:
 - A workspace always keeps one active owner.
 - Invitation tokens are stored hashed; with no email service yet, the inviter sees the link once.
 - Not yet verified against a live Supabase stack (no Docker here): the Next.js pages are type-checked and built, the SQL is tested on Postgres 16 with a stand-in `auth` schema.
+
+## Phases 2-3 (built): core CRM
+Accounts, contacts, duplicate protection, lead inbox with explainable scoring,
+web capture form at `/capture/<workspace>`, round-robin assignment, lead
+conversion (links existing records), pipeline board with automatic history,
+Today queue, activity timeline. Visibility is ownership-based: Staff see their
+own records, Managers/Owners (`crm.read_all`) see the workspace. Nothing is
+deleted; records are archived. Tests: `tests/db/crm.test.ts`.
+
+## Before going live
+Not built yet, and required for a sellable SaaS: public marketing site, plans and
+subscription billing, transactional email (invitations, password reset), email
+sync and outreach sequences, meetings, quotes, forecasting, platform super-admin,
+CSV import/export, rate limiting on the public form, backups and monitoring.
+Deploy target: any Node 22 host (e.g. Vercel) plus a hosted Supabase project;
+apply `supabase/migrations/` with `supabase db push`, set the two
+`NEXT_PUBLIC_SUPABASE_*` variables, and turn on email confirmation in Supabase Auth.

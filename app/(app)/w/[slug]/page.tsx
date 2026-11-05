@@ -6,7 +6,7 @@ export default async function Overview({ params }: { params: Promise<{ slug: str
   return (
     <section>
       <h1 className="text-2xl font-semibold">{tenant.name}</h1>
-      <p className="mt-1 text-muted">You are signed in as {role.name}. Accounts, leads and pipelines arrive in the next phases.</p>
+      <p className="mt-1 text-muted">You are signed in as {role.name}. Your web lead form is at <code>/capture/{slug}</code>.</p>
     </section>
   );
 }

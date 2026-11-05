@@ -9,6 +9,9 @@ Numbers in brackets are section numbers of that document.
 - History is append-only: stage changes, amount changes, ownership, forecast snapshots [7, 13].
 - Suppression is checked before every automated send, not only at enrolment [10].
 
+## Progress
+Done: 1 (foundation), 2 (accounts/contacts, except import/merge UI), 3 (leads/pipeline, except stage-settings UI). Remaining: 4 (partial: Today exists), 5-9.
+
 ## Phases
 1. **Foundation**: auth, workspaces and switching, roles and permissions, audit log, tenant isolation tests [2, 4].
 2. **Core CRM**: accounts, contacts, duplicate review and merge, CSV import/export, timeline [5, 16].
