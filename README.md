@@ -4,7 +4,7 @@ Multi-tenant CRM for B2B teams, distributors, agencies and service businesses:
 accounts, contacts, lead intake, opportunities, outreach sequences, meetings,
 quotations, forecasting and sales handover. Each subscribing company is isolated.
 
-**Status: foundation, core CRM, leads/pipeline, marketing site, plans and trials, Razorpay billing, Brevo email and platform admin are built; sequences, meetings, quotes, forecasting, import/export are not.** See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md). Not yet production-ready: see "Before going live" below.
+**Status: foundation, core CRM, leads/pipeline, marketing site, plans and trials, Razorpay billing, Brevo email and platform admin are built; quotes (catalogue, GST, approvals, customer review link, revisions) and forecasting (targets, adjustments, snapshots) are built; Google mail/calendar sync, sequences, meetings, import/export are not.** See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md). Not yet production-ready: see "Before going live" below.
 
 Proposed stack (same as the Tendwell project): Next.js, TypeScript, Supabase
 (Postgres, Auth, row-level security), Tailwind, Vitest.
@@ -57,3 +57,10 @@ apply `supabase/migrations/` with `supabase db push`, set the two
 - Expiry: run "Suspend lapsed trials and unpaid workspaces" in `/admin` (schedule it daily once you have a job runner).
 - Plan prices are placeholders (Starter 1,499 / Growth 4,999 / Scale 12,999 per month); edit the `plans` table.
 - Unverified against live Razorpay/Brevo/Supabase: signature check, event parsing and all SQL are tested; the HTTP calls to Razorpay and Brevo are not.
+
+## Quotes and forecast (built)
+- Catalogue (`/products`), quotes with per-line GST, discount approval above a workspace threshold (default 10%), no self-approval except owners, locked once submitted, versions via "Create revision" (revising an accepted quote needs a quote approver).
+- Customer review at `/quote/<token>`: no account needed; accepting moves the opportunity to Won at the quoted total. The link is shown once to the sender (emailing it comes with the mailbox work). Expiry is checked when the customer responds and shown live; "expire_quotes" updates stored statuses.
+- Money rule is identical in SQL and `lib/rules/quote.ts`; a test compares them.
+- Forecast: Commit/Best case/Pipeline from stage probability, manager adjustments (reason required, history kept) shown beside the calculation, team/owner targets, immutable snapshots with change since the last one, slipping deals.
+- Formal e-signatures and PDF generation are not included (separate services per the scope).

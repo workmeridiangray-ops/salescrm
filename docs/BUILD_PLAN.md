@@ -10,7 +10,7 @@ Numbers in brackets are section numbers of that document.
 - Suppression is checked before every automated send, not only at enrolment [10].
 
 ## Progress
-Done: 1 (foundation), 2 (accounts/contacts, except import/merge UI), 3 (leads/pipeline, except stage-settings UI). Remaining: 4 (partial: Today exists), 5-9.
+Done: 1 (foundation), 2 (accounts/contacts, except import/merge UI), 3 (leads/pipeline, except stage-settings UI). Also done: SaaS layer (8, except webhooks/API keys), quotes and forecasts (6, except report library). Remaining: 5 (needs Google credentials), 7 (territories/handover), import/export, reports, 9.
 
 ## Phases
 1. **Foundation**: auth, workspaces and switching, roles and permissions, audit log, tenant isolation tests [2, 4].
