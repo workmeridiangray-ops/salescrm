@@ -18,6 +18,7 @@ export const PERMISSIONS = {
   "quotes.approve": "Approve discounted quotes and revise accepted ones",
   "forecast.manage": "Set targets, adjust forecasts and take snapshots",
   "products.manage": "Manage the product catalogue",
+  "records.reassign": "Move a person's records to someone else",
 } as const;
 export type Permission = keyof typeof PERMISSIONS;
 export const ALL_PERMISSIONS = Object.keys(PERMISSIONS) as Permission[];
@@ -26,7 +27,7 @@ export const SYSTEM_ROLES: Record<"owner" | "manager" | "staff", { name: string;
   owner: { name: "Owner", permissions: [...ALL_PERMISSIONS].sort() },
   manager: {
     name: "Manager",
-    permissions: ["audit.view", "crm.read_all", "crm.write", "forecast.manage", "members.invite", "members.view", "pipeline.configure", "products.manage", "quotes.approve"],
+    permissions: ["audit.view", "crm.read_all", "crm.write", "forecast.manage", "members.invite", "members.view", "pipeline.configure", "products.manage", "quotes.approve", "records.reassign"],
   },
   staff: { name: "Staff", permissions: ["crm.write"] },
 };
@@ -95,6 +96,13 @@ export const ERROR_TEXT: Record<string, string> = {
   revision_needs_approval: "Revising an accepted quote needs a quote approver.",
   opportunity_not_found: "That opportunity no longer exists.",
   name_required: "Please enter your name.",
+  same_person: "Choose a different person to hand the records to.",
+  opportunity_not_won: "Renewals and expansions start from a won deal.",
+  handover_not_found: "That handover no longer exists.",
+  handover_incomplete: "Finish every checklist item first.",
+  handover_already_complete: "This handover is already complete.",
+  too_many_rows: "Imports are limited to 2,000 rows at a time. Split the file.",
+  account_not_found: "No account with that name. Import accounts first.",
   invitation_not_pending: "That invitation is no longer pending.",
 };
 

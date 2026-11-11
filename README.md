@@ -4,7 +4,7 @@ Multi-tenant CRM for B2B teams, distributors, agencies and service businesses:
 accounts, contacts, lead intake, opportunities, outreach sequences, meetings,
 quotations, forecasting and sales handover. Each subscribing company is isolated.
 
-**Status: foundation, core CRM, leads/pipeline, marketing site, plans and trials, Razorpay billing, Brevo email and platform admin are built; quotes (catalogue, GST, approvals, customer review link, revisions) and forecasting (targets, adjustments, snapshots) are built; Google mail/calendar sync, sequences, meetings, import/export are not.** See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md). Not yet production-ready: see "Before going live" below.
+**Status: foundation, core CRM, leads/pipeline, marketing site, plans and trials, Razorpay billing, Brevo email and platform admin are built; quotes (catalogue, GST, approvals, customer review link, revisions) and forecasting (targets, adjustments, snapshots) are built; teams, reassignment, won-deal handover, renewals and CSV import/export are built; Google mail/calendar sync, outreach sequences, meetings and the reports library are not.** See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md). Not yet production-ready: see "Before going live" below.
 
 Proposed stack (same as the Tendwell project): Next.js, TypeScript, Supabase
 (Postgres, Auth, row-level security), Tailwind, Vitest.
@@ -64,3 +64,9 @@ apply `supabase/migrations/` with `supabase db push`, set the two
 - Money rule is identical in SQL and `lib/rules/quote.ts`; a test compares them.
 - Forecast: Commit/Best case/Pipeline from stage probability, manager adjustments (reason required, history kept) shown beside the calculation, team/owner targets, immutable snapshots with change since the last one, slipping deals.
 - Formal e-signatures and PDF generation are not included (separate services per the scope).
+
+## Teams, handover, renewals, import/export (built)
+- Teams: a team lead sees and can work on records owned by their team members. Reassignment (`Teams` page) moves a leaver's live records in one audited step; won/lost deals keep their owner.
+- Handover: created automatically when a deal is won, with the accepted quote's terms, a 5-item checklist, scope/commitments, escalation note; completion needs every item. Renewal or expansion opportunities start from a won deal and appear under Renewals.
+- CSV import (accounts, contacts, leads): validated twice (in the browser flow and again in the database), per-row errors, duplicates skipped, safe to re-run. Export (accounts, contacts, leads, opportunities) respects row visibility, needs the `crm.export` permission (owners by default), neutralises spreadsheet formulas, and is audited.
+- Not built: automatic territory rules (matching by attribute) and shared-account access beyond teams; see "Not built" notes in the final summary.
