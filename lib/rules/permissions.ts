@@ -19,6 +19,7 @@ export const PERMISSIONS = {
   "forecast.manage": "Set targets, adjust forecasts and take snapshots",
   "products.manage": "Manage the product catalogue",
   "records.reassign": "Move a person's records to someone else",
+  "api.manage": "Manage API keys and webhooks",
 } as const;
 export type Permission = keyof typeof PERMISSIONS;
 export const ALL_PERMISSIONS = Object.keys(PERMISSIONS) as Permission[];
@@ -103,6 +104,10 @@ export const ERROR_TEXT: Record<string, string> = {
   handover_already_complete: "This handover is already complete.",
   too_many_rows: "Imports are limited to 2,000 rows at a time. Split the file.",
   account_not_found: "No account with that name. Import accounts first.",
+  api_key_not_found: "That API key doesn't exist or is already revoked.",
+  webhook_limit: "A workspace can have up to 10 webhooks.",
+  webhook_not_found: "That webhook no longer exists.",
+  delivery_not_retryable: "Only failed deliveries can be retried.",
   invitation_not_pending: "That invitation is no longer pending.",
 };
 

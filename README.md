@@ -4,7 +4,7 @@ Multi-tenant CRM for B2B teams, distributors, agencies and service businesses:
 accounts, contacts, lead intake, opportunities, outreach sequences, meetings,
 quotations, forecasting and sales handover. Each subscribing company is isolated.
 
-**Status: foundation, core CRM, leads/pipeline, marketing site, plans and trials, Razorpay billing, Brevo email and platform admin are built; quotes (catalogue, GST, approvals, customer review link, revisions) and forecasting (targets, adjustments, snapshots) are built; teams, reassignment, won-deal handover, renewals and CSV import/export are built; Google mail/calendar sync, outreach sequences, meetings and the reports library are not.** See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md). Not yet production-ready: see "Before going live" below.
+**Status: foundation, core CRM, leads/pipeline, marketing site, plans and trials, Razorpay billing, Brevo email and platform admin are built; quotes (catalogue, GST, approvals, customer review link, revisions) and forecasting (targets, adjustments, snapshots) are built; teams, reassignment, won-deal handover, renewals and CSV import/export are built; reports, API keys and webhooks are built; Google mail/calendar sync, outreach sequences and meetings are not.** See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md). Not yet production-ready: see "Before going live" below.
 
 Proposed stack (same as the Tendwell project): Next.js, TypeScript, Supabase
 (Postgres, Auth, row-level security), Tailwind, Vitest.
@@ -70,3 +70,10 @@ apply `supabase/migrations/` with `supabase db push`, set the two
 - Handover: created automatically when a deal is won, with the accepted quote's terms, a 5-item checklist, scope/commitments, escalation note; completion needs every item. Renewal or expansion opportunities start from a won deal and appear under Renewals.
 - CSV import (accounts, contacts, leads): validated twice (in the browser flow and again in the database), per-row errors, duplicates skipped, safe to re-run. Export (accounts, contacts, leads, opportunities) respects row visibility, needs the `crm.export` permission (owners by default), neutralises spreadsheet formulas, and is audited.
 - Not built: automatic territory rules (matching by attribute) and shared-account access beyond teams; see "Not built" notes in the final summary.
+
+## Reports, API and webhooks (built)
+- Reports (`/reports`): lead sources, funnel, sales cycle, stage ageing, seller performance (outcomes first), lost deals. Date range, saved/shared views, CSV download (needs `crm.export`, audited). They run as the viewer, so staff see their own numbers and managers the workspace's.
+- Public API: `GET /api/v1/{accounts|contacts|leads|opportunities}?limit&after` and `POST /api/v1/leads` with `Authorization: Bearer sk_live_...`. Keys are scoped, stored hashed, shown once, revocable, limited to 120 requests/minute, and work only while the workspace is not suspended.
+- Webhooks: `lead.created`, `opportunity.won`, `quote.accepted` to https endpoints only, signed with HMAC-SHA256 (`X-Webhook-Signature`, `X-Webhook-Timestamp`). Retries after 1m, 5m, 30m, 2h, 12h, then marked dead (owner can retry). Targets that resolve to private addresses are refused at send time.
+- **Scheduler needed**: something must call `POST /api/webhooks/dispatch` every minute with `Authorization: Bearer $CRON_SECRET` (e.g. a Vercel cron, GitHub Actions schedule, or any cron service). Without it, deliveries queue but are not sent. Same for `POST /api/razorpay/webhook`'s sibling needs: none.
+- Scheduled report emails are not built (needs the email work and a scheduler).

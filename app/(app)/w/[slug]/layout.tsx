@@ -19,6 +19,8 @@ export default async function WorkspaceLayout({ children, params }: { children: 
     { href: `/w/${slug}/renewals`, label: "Renewals", show: can(perms, "crm.write") || can(perms, "crm.read_all") },
     { href: `/w/${slug}/team`, label: "Teams", show: can(perms, "members.view") },
     { href: `/w/${slug}/data`, label: "Import / export", show: can(perms, "crm.write") },
+    { href: `/w/${slug}/reports`, label: "Reports", show: can(perms, "crm.write") || can(perms, "crm.read_all") },
+    { href: `/w/${slug}/integrations`, label: "Integrations", show: can(perms, "api.manage") },
     { href: `/w/${slug}`, label: "Overview", show: true },
     { href: `/w/${slug}/members`, label: "Members", show: can(perms, "members.view") },
     { href: `/w/${slug}/roles`, label: "Roles", show: can(perms, "roles.manage") || can(perms, "members.view") },
