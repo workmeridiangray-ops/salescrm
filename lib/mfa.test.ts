@@ -11,7 +11,7 @@ describe("mfaRedirect", () => {
     expect(mfaRedirect("aal1", "aal2", "/w/acme/members", "?x=1")).toBe("/mfa?next=%2Fw%2Facme%2Fmembers%3Fx%3D1");
   });
   it("never loops and never blocks public or machine endpoints", () => {
-    for (const p of ["/mfa", "/login", "/api/v1/accounts", "/api/webhooks/dispatch", "/capture/acme", "/quote/abc"]) expect(mfaRedirect("aal1", "aal2", p)).toBeNull();
+    for (const p of ["/mfa", "/login", "/api/v1/accounts", "/api/webhooks/dispatch", "/capture/acme", "/quote/abc", "/u/t", "/book/x-y", "/m/t"]) expect(mfaRedirect("aal1", "aal2", p)).toBeNull();
   });
   it("does not carry an unsafe next target", () => {
     expect(mfaRedirect("aal1", "aal2", "//evil.test")).toBe("/mfa?next=%2Fworkspaces");

@@ -16,7 +16,7 @@ export default async function Fields({ params, searchParams }: { params: Promise
     <section className="space-y-5">
       <h1 className="text-2xl font-semibold">Custom fields</h1>
       <Notice error={sp.error} ok={sp.ok} />
-      <p className="text-sm text-muted">Add the extra details your team needs, up to 20 per record type. Fields can be hidden but never lose their data. Today they are editable on the account page; the API and the database accept them for contacts, leads and opportunities too.</p>
+      <p className="text-sm text-muted">Add the extra details your team needs, up to 20 per record type. Fields can be hidden but never lose their data. They are editable on the account and contact pages, inside lead cards and inside pipeline cards.</p>
       {(data ?? []).length === 0 ? <Empty>No custom fields yet.</Empty> : (
         <div className="card overflow-x-auto p-0"><table className="w-full text-left text-sm"><thead className="border-b border-line text-muted"><tr><th className="p-3">Record</th><th className="p-3">Label</th><th className="p-3">Type</th><th className="p-3">Rules</th><th className="p-3" /></tr></thead>
           <tbody>{(data ?? []).map((d) => (

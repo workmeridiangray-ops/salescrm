@@ -20,6 +20,8 @@ export const PERMISSIONS = {
   "products.manage": "Manage the product catalogue",
   "records.reassign": "Move a person's records to someone else",
   "api.manage": "Manage API keys and webhooks",
+  "sequences.manage": "Build sequences and enrol contacts you can edit",
+  "sequences.activate": "Approve, pause and resume sequences; manage the suppression list",
 } as const;
 export type Permission = keyof typeof PERMISSIONS;
 export const ALL_PERMISSIONS = Object.keys(PERMISSIONS) as Permission[];
@@ -28,9 +30,9 @@ export const SYSTEM_ROLES: Record<"owner" | "manager" | "staff", { name: string;
   owner: { name: "Owner", permissions: [...ALL_PERMISSIONS].sort() },
   manager: {
     name: "Manager",
-    permissions: ["audit.view", "crm.read_all", "crm.write", "forecast.manage", "members.invite", "members.view", "pipeline.configure", "products.manage", "quotes.approve", "records.reassign"],
+    permissions: ["audit.view", "crm.read_all", "crm.write", "forecast.manage", "members.invite", "members.view", "pipeline.configure", "products.manage", "quotes.approve", "records.reassign", "sequences.activate", "sequences.manage"],
   },
-  staff: { name: "Staff", permissions: ["crm.write"] },
+  staff: { name: "Staff", permissions: ["crm.write", "sequences.manage"] },
 };
 
 export const can = (held: readonly string[], p: Permission) => held.includes(p);
@@ -108,6 +110,22 @@ export const ERROR_TEXT: Record<string, string> = {
   webhook_limit: "A workspace can have up to 10 webhooks.",
   webhook_not_found: "That webhook no longer exists.",
   delivery_not_retryable: "Only failed deliveries can be retried.",
+  rule_limit: "A workspace can have up to 50 territory rules.",
+  rule_not_found: "That rule no longer exists.",
+  recipient_not_member: "Reports can only be emailed to active members of this workspace.",
+  schedule_limit: "A workspace can have up to 10 scheduled reports.",
+  schedule_not_found: "That schedule no longer exists.",
+  sequence_locked: "Steps can't change after a sequence is activated. Duplicate it to change the plan.",
+  sequence_empty: "Add at least one step first.",
+  sequence_needs_email: "A sequence needs at least one email step.",
+  sequence_not_active: "The sequence must be active to enrol people.",
+  sequence_not_found: "That sequence no longer exists.",
+  enrolment_not_found: "That enrolment no longer exists.",
+  contact_not_found: "That contact no longer exists.",
+  slot_taken: "That time was just taken. Please choose another.",
+  booking_unavailable: "This booking page isn't available.",
+  too_many_bookings: "You already have several upcoming bookings with us. Cancel one first.",
+  meeting_closed: "Finished or cancelled meetings can't be changed.",
   invitation_not_pending: "That invitation is no longer pending.",
 };
 
@@ -116,6 +134,8 @@ export function friendlyError(message: string | undefined): string {
   if (ERROR_TEXT[message]) return ERROR_TEXT[message]!;
   if (/duplicate key.*slug/.test(message)) return "That workspace address is taken.";
   if (/duplicate key.*\(tenant_id, key\)/.test(message)) return "A role with that key already exists.";
+  if (/meetings_no_overlap/.test(message)) return "That overlaps another meeting on your calendar (buffer time included).";
+  if (/booking_links_slug_key/.test(message)) return "That booking address is taken. Try another.";
   if (/accounts_name_unique/.test(message)) return "An account with that name already exists.";
   if (/contacts_email_unique|leads_email_open/.test(message)) return "A record with that email already exists.";
   if (/violates row-level security/.test(message)) return "You can only change records you own.";

@@ -26,6 +26,8 @@ export default async function WorkspaceLayout({ children, params }: { children: 
     { href: `/w/${slug}/merge`, label: "Duplicates", show: can(perms, "crm.write") || can(perms, "crm.read_all") },
     { href: `/w/${slug}/fields`, label: "Custom fields", show: can(perms, "tenant.configure") },
     { href: `/w/${slug}/settings`, label: "Settings", show: true },
+    { href: `/w/${slug}/sequences`, label: "Sequences", show: can(perms, "sequences.manage") },
+    { href: `/w/${slug}/meetings`, label: "Meetings", show: can(perms, "crm.write") || can(perms, "crm.read_all") },
     { href: `/w/${slug}`, label: "Overview", show: true },
     { href: `/w/${slug}/members`, label: "Members", show: can(perms, "members.view") },
     { href: `/w/${slug}/roles`, label: "Roles", show: can(perms, "roles.manage") || can(perms, "members.view") },

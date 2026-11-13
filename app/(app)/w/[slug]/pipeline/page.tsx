@@ -4,6 +4,7 @@ import { can } from "@/lib/rules/permissions";
 import { getWorkspace } from "@/lib/workspace";
 import { Badge, Hidden, Notice } from "@/components/ui";
 import { inr, one } from "@/lib/util";
+import { CustomFields } from "@/components/custom-fields";
 import { archiveRecord, createOpportunity, moveOpportunity } from "../actions";
 
 export const metadata: Metadata = { title: "Pipeline" };
@@ -52,6 +53,7 @@ export default async function Pipeline({ params, searchParams }: { params: Promi
                     <input className="input" name="loss_reason" placeholder="Reason (required for Lost)" aria-label="Loss reason" />
                     <button className="btn-quiet w-full">Move</button>
                   </form>
+                  <details className="text-xs"><summary className="cursor-pointer text-muted">Custom fields</summary><CustomFields slug={slug} tenantId={tenant.id} entity="opportunities" id={o.id} back={`/w/${slug}/pipeline`} /></details>
                   {o.status !== "open" && <form action={archiveRecord}><Hidden name="slug" value={slug} /><Hidden name="table" value="opportunities" /><Hidden name="id" value={o.id} /><button className="text-xs text-muted underline">Archive</button></form>}
                 </li>))}
               </ul>

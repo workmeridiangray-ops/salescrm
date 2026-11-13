@@ -13,7 +13,7 @@ describe("safeNext", () => {
 describe("isPublicPath", () => {
   it("only the landing and login are public", () => {
     expect(isPublicPath("/login")).toBe(true);
-    for (const p of ["/capture/acme", "/quote/abc", "/pricing", "/features", "/demo", "/api/razorpay/webhook", "/api/v1/accounts", "/api/webhooks/dispatch"]) expect(isPublicPath(p)).toBe(true);
+    for (const p of ["/capture/acme", "/quote/abc", "/pricing", "/features", "/demo", "/api/razorpay/webhook", "/api/v1/accounts", "/api/webhooks/dispatch", "/api/reports/dispatch", "/api/sequences/dispatch", "/u/tok", "/book/acme-intro", "/m/tok"]) expect(isPublicPath(p)).toBe(true);
     expect(isPublicPath("/admin")).toBe(false);
     expect(isPublicPath("/w/acme")).toBe(false);
     expect(isPublicPath("/invite/abc")).toBe(false);

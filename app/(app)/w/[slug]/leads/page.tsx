@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { can } from "@/lib/rules/permissions";
 import { getWorkspace } from "@/lib/workspace";
 import { Badge, Empty, Hidden, Notice, Pager } from "@/components/ui";
+import { CustomFields } from "@/components/custom-fields";
 import { PAGE_SIZE, pageOf } from "@/lib/util";
 import { convertLead, createLead, disqualifyLead, qualifyLead } from "../actions";
 
@@ -49,6 +50,7 @@ export default async function Leads({ params, searchParams }: { params: Promise<
                 <ul className="mt-1 list-disc pl-5">{(l.score_reasons as { points: number; reason: string }[]).map((r) => <li key={r.reason}>+{r.points} {r.reason}</li>)}</ul>
               </details>
               {l.status === "disqualified" && <p className="text-sm">Reason: {l.disqualify_reason}</p>}
+              <details className="text-sm"><summary className="cursor-pointer text-muted">Custom fields</summary><CustomFields slug={slug} tenantId={tenant.id} entity="leads" id={l.id} back={`/w/${slug}/leads`} /></details>
               {(l.status === "new" || l.status === "qualified") && (
                 <div className="flex flex-wrap items-end gap-2">
                   {l.status === "new" && <form action={qualifyLead}><Hidden name="slug" value={slug} /><Hidden name="id" value={l.id} /><button className="btn-quiet">Qualify</button></form>}

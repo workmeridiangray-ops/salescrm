@@ -7,6 +7,6 @@ import { safeNext } from "./routing";
  */
 export function mfaRedirect(current: string | null | undefined, next: string | null | undefined, path: string, search = ""): string | null {
   if (next !== "aal2" || current === "aal2") return null;
-  if (path === "/mfa" || path === "/login" || path.startsWith("/api/") || path.startsWith("/capture/") || path.startsWith("/quote/")) return null;
+  if (path === "/mfa" || path === "/login" || path.startsWith("/api/") || path.startsWith("/capture/") || path.startsWith("/quote/") || path.startsWith("/u/") || path.startsWith("/book/") || path.startsWith("/m/")) return null;
   return `/mfa?next=${encodeURIComponent(safeNext(path + search))}`;
 }

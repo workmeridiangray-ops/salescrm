@@ -1,6 +1,6 @@
-import { timingSafeEqual } from "node:crypto";
 import { lookup } from "node:dns/promises";
 import { NextResponse } from "next/server";
+import { cronAuthorized } from "@/lib/cron";
 import { createServiceClient } from "@/lib/supabase/service";
 import { isPrivateIp, isSafeWebhookUrl, signPayload } from "@/lib/webhooks";
 
@@ -42,10 +42,7 @@ async function deliver(d: Claimed): Promise<{ ok: boolean; http: number | null; 
 
 /** Call every minute from a scheduler with  Authorization: Bearer $CRON_SECRET. */
 export async function POST(request: Request) {
-  const secret = process.env.CRON_SECRET ?? "";
-  const given = (request.headers.get("authorization") ?? "").replace(/^Bearer\s+/, "");
-  const a = Buffer.from(given), b = Buffer.from(secret);
-  if (!secret || a.length !== b.length || !timingSafeEqual(a, b)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!cronAuthorized(request)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const db = createServiceClient();
   const { data, error } = await db.rpc("webhook_claim_batch", { p_limit: 20 });

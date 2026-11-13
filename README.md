@@ -4,7 +4,7 @@ Multi-tenant CRM for B2B teams, distributors, agencies and service businesses:
 accounts, contacts, lead intake, opportunities, outreach sequences, meetings,
 quotations, forecasting and sales handover. Each subscribing company is isolated.
 
-**Status: foundation, core CRM, leads/pipeline, marketing site, plans and trials, Razorpay billing, Brevo email and platform admin are built; quotes (catalogue, GST, approvals, customer review link, revisions) and forecasting (targets, adjustments, snapshots) are built; teams, reassignment, won-deal handover, renewals and CSV import/export are built; reports, API keys, webhooks, duplicate merge, stage settings and templates, custom fields, two-step sign-in, support-access grants and workspace closure are built; Google mail/calendar sync, outreach sequences, meetings, scheduled report emails, automatic territory rules, coupons/refunds and PDF/e-signature are not.** See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md). Not yet production-ready: see "Before going live" below.
+**Status: foundation, core CRM, leads/pipeline, marketing site, plans and trials, Razorpay billing, Brevo email and platform admin are built; quotes (catalogue, GST, approvals, customer review link, revisions) and forecasting (targets, adjustments, snapshots) are built; teams, reassignment, won-deal handover, renewals and CSV import/export are built; reports, API keys, webhooks, duplicate merge, stage settings and templates, custom fields, two-step sign-in, support-access grants and workspace closure are built; outreach sequences, meetings and booking pages, scheduled report emails and lead territory rules are built; Google mailbox/calendar sync, coupons/refunds and PDF/e-signature are not.** See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md). Not yet production-ready: see "Before going live" below.
 
 Proposed stack (same as the Tendwell project): Next.js, TypeScript, Supabase
 (Postgres, Auth, row-level security), Tailwind, Vitest.
@@ -86,3 +86,17 @@ apply `supabase/migrations/` with `supabase db push`, set the two
 - Support access: owners grant 4h/24h/3d windows with a reason; platform support then sees counts and recent audit only (never records) and each view is audited.
 - Workspace closure: owner types the workspace address, 30-day countdown with full use and export, cancel any time; platform owners purge workspaces past 30 days (the audit entry is kept).
 - `node scripts/a11y-smoke.mjs` runs axe (WCAG 2.1 AA) and a horizontal-scroll check at desktop and phone width on the public pages; it also runs in CI. Signed-in screens still need a live Supabase to be checked the same way.
+
+## Final build pass (built)
+- **Lead territories** (Teams page): domain rules, first match wins, never takes a lead from its owner; web/API capture consults them before round robin. Documented defaults, change if your process differs.
+- **Scheduled report emails** (Reports page): weekly (Mon 07:00 IST) or monthly (1st), members only, needs `crm.read_all` + `crm.export`. Scheduler: `POST /api/reports/dispatch` hourly with `Authorization: Bearer $CRON_SECRET`.
+- **Outreach sequences** (Sequences): email and call-task steps, manager approval to go live, steps frozen after activation, daily cap and sending window, suppression and opt-out re-checked before every send, stops on reply / unsubscribe / opt-out / owner leaving / 3 failed sends, reassigning moves live sequences. Every email gets an unsubscribe link and RFC 8058 one-click headers. Sent through Brevo from your verified sender with the seller as Reply-To. Scheduler: `POST /api/sequences/dispatch` every 5 minutes. **Replies are marked by hand** ("They replied") because there is no mailbox sync. No open/click tracking by design.
+- **Meetings and booking pages**: availability per person, public booking page `/book/<address>`, server-side slot check, buffers, notice and window, a database constraint that makes double-booking impossible, attendee self-cancel link `/m/<token>`, outcomes (attended / no-show), calendar download (.ics).
+- **Contact page** with custom fields, sequences, meetings and timeline; custom fields now also appear in lead and pipeline cards.
+- Accessibility smoke test now also covers pricing, booking, booking-management, quote review and unsubscribe pages (12 pages at desktop and phone width, all pass).
+
+### Not built, and why
+- Google/Microsoft mailbox and calendar **sync**: needs OAuth app credentials from you. Until then replies are marked by hand and meetings live in this app (with .ics export).
+- **Coupons and refunds**: they happen inside Razorpay; money movement should stay a deliberate dashboard action until you decide the rules.
+- **PDF quotes and e-signatures**: separate paid services in your scope document.
+- Load testing and signed-in browser testing: need a live Supabase project.

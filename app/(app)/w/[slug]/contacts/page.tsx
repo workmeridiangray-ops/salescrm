@@ -28,7 +28,7 @@ export default async function Contacts({ params, searchParams }: { params: Promi
         <div className="card overflow-x-auto p-0"><table className="w-full text-left text-sm">
           <thead className="border-b border-line text-muted"><tr><th className="p-3">Name</th><th className="p-3">Email</th><th className="p-3">Account</th><th className="p-3">Status</th></tr></thead>
           <tbody>{rows.map((c) => { const a = one(c.accounts as { id: string; name: string } | { id: string; name: string }[] | null); return (
-            <tr key={c.id} className="border-b border-line last:border-0"><td className="p-3 font-medium">{c.full_name}<span className="block text-muted">{c.job_title}</span></td>
+            <tr key={c.id} className="border-b border-line last:border-0"><td className="p-3 font-medium"><a className="text-accent underline" href={`/w/${slug}/contacts/${c.id}`}>{c.full_name}</a><span className="block text-muted">{c.job_title}</span></td>
               <td className="p-3">{c.email ?? "—"}</td>
               <td className="p-3">{a ? <a className="text-accent underline" href={`/w/${slug}/accounts/${a.id}`}>{a.name}</a> : "—"}</td>
               <td className="p-3">{c.opted_out ? <Badge tone="red">Opted out</Badge> : <Badge tone="green">Reachable</Badge>}</td></tr>); })}</tbody></table></div>

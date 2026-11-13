@@ -4,7 +4,7 @@ import { can } from "@/lib/rules/permissions";
 import { requirePermission } from "@/lib/workspace";
 import { Badge, Empty, Hidden, Notice } from "@/components/ui";
 import { one } from "@/lib/util";
-import { addToTeam, createTeam, reassign, removeFromTeam } from "./actions";
+import { addRule, addToTeam, applyRules, createTeam, deleteRule, moveRule, reassign, removeFromTeam } from "./actions";
 
 export const metadata: Metadata = { title: "Teams" };
 
@@ -13,10 +13,11 @@ export default async function Team({ params, searchParams }: { params: Promise<{
   const sp = await searchParams;
   const { tenant, perms } = await requirePermission(slug, "members.view");
   const supabase = await createClient();
-  const [{ data: teams }, { data: tm }, { data: members }] = await Promise.all([
+  const [{ data: teams }, { data: tm }, { data: members }, { data: rules }] = await Promise.all([
     supabase.from("teams").select("id, name").eq("tenant_id", tenant.id).order("name"),
     supabase.from("team_members").select("team_id, user_id, is_lead").eq("tenant_id", tenant.id),
     supabase.from("memberships").select("user_id, status, profiles(email, full_name)").eq("tenant_id", tenant.id).order("created_at"),
+    supabase.from("territory_rules").select("id, position, match_value, owner_id").eq("tenant_id", tenant.id).order("position"),
   ]);
   const people = (members ?? []).map((m) => { const p = one(m.profiles as { email: string; full_name: string } | { email: string; full_name: string }[] | null); return { id: m.user_id, status: m.status as string, label: p?.full_name || p?.email || m.user_id.slice(0, 8) }; });
   const label = (id: string) => people.find((p) => p.id === id)?.label ?? id.slice(0, 8);
@@ -40,6 +41,22 @@ export default async function Team({ params, searchParams }: { params: Promise<{
               <label className="text-xs"><input type="checkbox" name="lead" /> lead</label><button className="btn-quiet">Add</button></form>}
           </div>))}</div>)}
       {manage && <form action={createTeam} className="card flex items-end gap-3">{hid}<label className="text-sm font-medium">New team<input className="input mt-1" name="name" required maxLength={80} /></label><button className="btn">Create team</button></form>}
+      {(move || (rules ?? []).length > 0) && (
+        <div className="card space-y-3"><h2 className="font-semibold">Lead territories</h2>
+          <p className="text-sm text-muted">New web and API leads are routed by the sender's email domain. The first rule from the top whose owner is still an active seller wins (sub-domains match). Leads that match nothing are shared out round-robin. Rules never take a lead away from its current owner.</p>
+          <ol className="space-y-1 text-sm">{(rules ?? []).map((r, i) => (
+            <li key={r.id} className="flex flex-wrap items-center gap-2"><span className="w-6 text-muted">{i + 1}.</span><code>{r.match_value}</code><span>→ {label(r.owner_id)}</span>
+              {move && <><form action={moveRule}>{hid}<Hidden name="id" value={r.id} /><Hidden name="dir" value="-1" /><button className="btn-quiet" aria-label="Move up">↑</button></form>
+                <form action={moveRule}>{hid}<Hidden name="id" value={r.id} /><Hidden name="dir" value="1" /><button className="btn-quiet" aria-label="Move down">↓</button></form>
+                <form action={deleteRule}>{hid}<Hidden name="id" value={r.id} /><button className="text-xs underline">Remove</button></form></>}</li>))}
+            {(rules ?? []).length === 0 && <li className="text-muted">No rules yet.</li>}</ol>
+          {move && (<>
+            <form action={addRule} className="flex flex-wrap items-end gap-3">{hid}
+              <label className="text-sm font-medium">Email domain<input className="input mt-1" name="domain" placeholder="bigco.com" required /></label>
+              <label className="text-sm font-medium">Owner<select name="owner" className="input mt-1">{people.filter((p) => p.status === "active").map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}</select></label>
+              <button className="btn-quiet">Add rule</button></form>
+            <form action={applyRules}>{hid}<button className="btn-quiet">Route unassigned leads now</button></form></>)}
+        </div>)}
       {move && (
         <form action={reassign} className="card space-y-3">{hid}
           <h2 className="font-semibold">Departures and handovers</h2>
