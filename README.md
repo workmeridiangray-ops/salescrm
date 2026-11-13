@@ -4,7 +4,7 @@ Multi-tenant CRM for B2B teams, distributors, agencies and service businesses:
 accounts, contacts, lead intake, opportunities, outreach sequences, meetings,
 quotations, forecasting and sales handover. Each subscribing company is isolated.
 
-**Status: foundation, core CRM, leads/pipeline, marketing site, plans and trials, Razorpay billing, Brevo email and platform admin are built; quotes (catalogue, GST, approvals, customer review link, revisions) and forecasting (targets, adjustments, snapshots) are built; teams, reassignment, won-deal handover, renewals and CSV import/export are built; reports, API keys and webhooks are built; Google mail/calendar sync, outreach sequences and meetings are not.** See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md). Not yet production-ready: see "Before going live" below.
+**Status: foundation, core CRM, leads/pipeline, marketing site, plans and trials, Razorpay billing, Brevo email and platform admin are built; quotes (catalogue, GST, approvals, customer review link, revisions) and forecasting (targets, adjustments, snapshots) are built; teams, reassignment, won-deal handover, renewals and CSV import/export are built; reports, API keys, webhooks, duplicate merge, stage settings and templates, custom fields, two-step sign-in, support-access grants and workspace closure are built; Google mail/calendar sync, outreach sequences, meetings, scheduled report emails, automatic territory rules, coupons/refunds and PDF/e-signature are not.** See [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md). Not yet production-ready: see "Before going live" below.
 
 Proposed stack (same as the Tendwell project): Next.js, TypeScript, Supabase
 (Postgres, Auth, row-level security), Tailwind, Vitest.
@@ -77,3 +77,12 @@ apply `supabase/migrations/` with `supabase db push`, set the two
 - Webhooks: `lead.created`, `opportunity.won`, `quote.accepted` to https endpoints only, signed with HMAC-SHA256 (`X-Webhook-Signature`, `X-Webhook-Timestamp`). Retries after 1m, 5m, 30m, 2h, 12h, then marked dead (owner can retry). Targets that resolve to private addresses are refused at send time.
 - **Scheduler needed**: something must call `POST /api/webhooks/dispatch` every minute with `Authorization: Bearer $CRON_SECRET` (e.g. a Vercel cron, GitHub Actions schedule, or any cron service). Without it, deliveries queue but are not sent. Same for `POST /api/razorpay/webhook`'s sibling needs: none.
 - Scheduled report emails are not built (needs the email work and a scheduler).
+
+## Leftovers pass (built)
+- Duplicates (`/duplicates`): likely pairs for accounts and contacts, field-by-field preview with conflicts, merge keeps the survivor's values and fills only empty fields, moves deals/contacts/activities/handovers, archives the other, logs the removed record.
+- Pipeline settings: add, rename, reorder, delete stages (not while deals are in them), win probability, up to 5 pipelines created from templates (Services, Distribution, Blank); the pipeline page switches between pipelines.
+- Custom fields: up to 20 per record type (text, number, date, choice, yes/no, required option); validated in the database for accounts, contacts, leads and opportunities; the editing screen exists on the account page only. Hiding a field keeps its data.
+- Two-step sign-in (TOTP authenticator): `/security` to enrol, `/mfa` to verify; middleware requires it once enrolled. **Untested end to end** (needs Supabase Auth).
+- Support access: owners grant 4h/24h/3d windows with a reason; platform support then sees counts and recent audit only (never records) and each view is audited.
+- Workspace closure: owner types the workspace address, 30-day countdown with full use and export, cancel any time; platform owners purge workspaces past 30 days (the audit entry is kept).
+- `node scripts/a11y-smoke.mjs` runs axe (WCAG 2.1 AA) and a horizontal-scroll check at desktop and phone width on the public pages; it also runs in CI. Signed-in screens still need a live Supabase to be checked the same way.

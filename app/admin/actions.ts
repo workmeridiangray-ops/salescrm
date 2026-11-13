@@ -22,3 +22,7 @@ export async function expireSubscriptions() {
   const { data, error } = await (await createClient()).rpc("platform_expire_subscriptions");
   back(error, `${data ?? 0} workspace(s) suspended`);
 }
+export async function purgeClosed() {
+  const { data, error } = await (await createClient()).rpc("platform_purge_closed");
+  back(error, `${data ?? 0} closed workspace(s) permanently deleted`);
+}

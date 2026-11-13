@@ -6,6 +6,8 @@ import { getWorkspace } from "@/lib/workspace";
 export default async function WorkspaceLayout({ children, params }: { children: ReactNode; params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const { tenant, role, perms } = await getWorkspace(slug);
+  const closeAt = (tenant as { closure_requested_at?: string | null }).closure_requested_at;
+  const closing = closeAt ? new Date(new Date(closeAt).getTime() + 30 * 86400000).toLocaleDateString("en-IN") : null;
   const links = [
     { href: `/w/${slug}/today`, label: "Today", show: can(perms, "crm.write") },
     { href: `/w/${slug}/leads`, label: "Leads", show: can(perms, "crm.write") || can(perms, "crm.read_all") },
@@ -21,6 +23,9 @@ export default async function WorkspaceLayout({ children, params }: { children: 
     { href: `/w/${slug}/data`, label: "Import / export", show: can(perms, "crm.write") },
     { href: `/w/${slug}/reports`, label: "Reports", show: can(perms, "crm.write") || can(perms, "crm.read_all") },
     { href: `/w/${slug}/integrations`, label: "Integrations", show: can(perms, "api.manage") },
+    { href: `/w/${slug}/merge`, label: "Duplicates", show: can(perms, "crm.write") || can(perms, "crm.read_all") },
+    { href: `/w/${slug}/fields`, label: "Custom fields", show: can(perms, "tenant.configure") },
+    { href: `/w/${slug}/settings`, label: "Settings", show: true },
     { href: `/w/${slug}`, label: "Overview", show: true },
     { href: `/w/${slug}/members`, label: "Members", show: can(perms, "members.view") },
     { href: `/w/${slug}/roles`, label: "Roles", show: can(perms, "roles.manage") || can(perms, "members.view") },
@@ -44,6 +49,7 @@ export default async function WorkspaceLayout({ children, params }: { children: 
             {can(perms, "billing.manage") ? <> <Link className="underline" href={`/w/${slug}/billing`}>Open billing</Link></> : " Ask a workspace owner to resolve billing."}
           </p>
         )}
+        {closing && <p role="alert" className="mb-4 rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">This workspace is scheduled for deletion on {closing}. <Link className="underline" href={`/w/${slug}/settings`}>Settings</Link></p>}
         {children}
       </div>
     </div>

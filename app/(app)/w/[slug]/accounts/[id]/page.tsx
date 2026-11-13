@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getWorkspace } from "@/lib/workspace";
 import { Badge, Empty, Hidden, Notice } from "@/components/ui";
 import { inr, one } from "@/lib/util";
+import { CustomFields } from "@/components/custom-fields";
 import { addActivity, archiveRecord, createContact } from "../../actions";
 
 export const metadata: Metadata = { title: "Account" };
@@ -28,6 +29,7 @@ export default async function AccountDetail({ params, searchParams }: { params: 
         {!account.archived_at && <form action={archiveRecord}><Hidden name="slug" value={slug} /><Hidden name="table" value="accounts" /><Hidden name="id" value={id} /><button className="btn-quiet">Archive</button></form>}
       </div>
       <Notice error={sp.error} ok={sp.ok} />
+      <CustomFields slug={slug} tenantId={tenant.id} entity="accounts" id={id} back={`/w/${slug}/accounts/${id}`} />
       <div><h2 className="text-lg font-semibold">Contacts</h2>
         {(contacts ?? []).length === 0 ? <Empty>No contacts yet.</Empty> : (
           <ul className="mt-2 space-y-2">{(contacts ?? []).map((c) => (

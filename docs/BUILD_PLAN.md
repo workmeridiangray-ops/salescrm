@@ -10,7 +10,7 @@ Numbers in brackets are section numbers of that document.
 - Suppression is checked before every automated send, not only at enrolment [10].
 
 ## Progress
-Done: 1 (foundation), 2 (accounts/contacts, except import/merge UI), 3 (leads/pipeline, except stage-settings UI). Also done: SaaS layer (8, except webhooks/API keys), quotes and forecasts (6, except report library). Also done: teams, reassignment, handover, renewals (7, except attribute-based territory rules), CSV import/export (16). Also done: reports library, saved views, API keys, webhooks (16, 18). Remaining: 5 (needs Google credentials), scheduled report emails, 9 (hardening: load/a11y/browser tests against a live stack).
+Done: 1 (foundation), 2 (accounts/contacts, except import/merge UI), 3 (leads/pipeline, except stage-settings UI). Also done: SaaS layer (8, except webhooks/API keys), quotes and forecasts (6, except report library). Also done: teams, reassignment, handover, renewals (7, except attribute-based territory rules), CSV import/export (16). Also done: reports library, saved views, API keys, webhooks (16, 18). Also done: duplicate merge, stage/pipeline settings, custom fields, MFA, support access, closure/purge, public-page accessibility smoke test. Remaining: 5 (needs Google credentials), scheduled report emails, territory rules (needs decisions), coupons/refunds (provider-side), PDF/e-signature (separate services), signed-in accessibility/load/browser tests against a live stack.
 
 ## Phases
 1. **Foundation**: auth, workspaces and switching, roles and permissions, audit log, tenant isolation tests [2, 4].

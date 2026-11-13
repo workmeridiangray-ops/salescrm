@@ -69,7 +69,9 @@ export async function convertLead(f: FormData) {
 export async function createOpportunity(f: FormData) {
   const supabase = await createClient();
   const tenant = s(f, "tenant");
-  const { data: st } = await supabase.from("stages").select("id, pipeline_id").eq("tenant_id", tenant).eq("kind", "open").order("position").limit(1).maybeSingle();
+  let sq = supabase.from("stages").select("id, pipeline_id").eq("tenant_id", tenant).eq("kind", "open").order("position").limit(1);
+  if (s(f, "pipeline")) sq = sq.eq("pipeline_id", s(f, "pipeline"));
+  const { data: st } = await sq.maybeSingle();
   if (!st) return finish(s(f, "slug"), "pipeline", { message: "no stage" });
   const { error } = await supabase.from("opportunities").insert({
     tenant_id: tenant, name: s(f, "name"), amount: Number(s(f, "amount")) || 0, account_id: opt(f, "account_id"),

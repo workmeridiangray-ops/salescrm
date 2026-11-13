@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { currentUser } from "@/lib/workspace";
 import { Badge, Empty, Hidden, Notice } from "@/components/ui";
-import { expireSubscriptions, setPlan, setTenantStatus } from "./actions";
+import { expireSubscriptions, purgeClosed, setPlan, setTenantStatus } from "./actions";
 
 export const metadata: Metadata = { title: "Platform admin" };
 
@@ -20,13 +20,13 @@ export default async function Admin({ searchParams }: { searchParams: Promise<Re
   return (
     <main className="mx-auto max-w-6xl space-y-6 p-6">
       <div className="flex flex-wrap items-center justify-between gap-2"><h1 className="text-2xl font-semibold">Platform admin</h1>
-        <form action={expireSubscriptions}><button className="btn-quiet">Suspend lapsed trials and unpaid workspaces</button></form></div>
+        <div className="flex gap-2"><form action={expireSubscriptions}><button className="btn-quiet">Suspend lapsed trials and unpaid workspaces</button></form><form action={purgeClosed}><button className="btn-quiet">Delete workspaces closed over 30 days ago</button></form></div></div>
       <Notice error={sp.error} ok={sp.ok} />
       <div className="card overflow-x-auto p-0"><table className="w-full text-left text-sm">
         <thead className="border-b border-line text-muted"><tr><th className="p-3">Workspace</th><th className="p-3">Status</th><th className="p-3">Plan</th><th className="p-3">Users</th><th className="p-3">Actions (reason required)</th></tr></thead>
         <tbody>{(tenants ?? []).map((t: any) => (
           <tr key={t.tenant_id} className="border-b border-line align-top last:border-0">
-            <td className="p-3"><p className="font-medium">{t.name}</p><p className="text-muted">{t.slug}</p></td>
+            <td className="p-3"><p className="font-medium">{t.name}</p><p className="text-muted">{t.slug}</p><a className="text-xs text-accent underline" href={`/admin/support/${t.tenant_id}`}>Support view</a></td>
             <td className="p-3"><Badge tone={t.tenant_status === "suspended" ? "red" : "green"}>{t.tenant_status}</Badge> <span className="text-muted">{t.sub_status}</span></td>
             <td className="p-3">{t.plan_key}</td><td className="p-3">{t.users}</td>
             <td className="p-3 space-y-2">

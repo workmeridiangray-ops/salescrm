@@ -19,7 +19,7 @@ export const currentUser = cache(async () => {
 export const getWorkspace = cache(async (slug: string) => {
   const user = await currentUser();
   const supabase = await createClient();
-  const { data: tenant } = await supabase.from("tenants").select("id, name, slug, status").eq("slug", slug).maybeSingle();
+  const { data: tenant } = await supabase.from("tenants").select("id, name, slug, status, closure_requested_at").eq("slug", slug).maybeSingle();
   if (!tenant) redirect("/access-denied");
   const { data: me } = await supabase
     .from("memberships")

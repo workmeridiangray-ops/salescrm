@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import { mfaRedirect } from "@/lib/mfa";
 import { isPublicPath } from "@/lib/routing";
 
 /** Refreshes the session cookie and sends signed-out visitors to /login. Data access is enforced by RLS, not here. */
@@ -22,6 +23,17 @@ export async function middleware(request: NextRequest) {
     url.pathname = "/login";
     url.search = `?next=${encodeURIComponent(path + request.nextUrl.search)}`;
     return NextResponse.redirect(url);
+  }
+  if (user) {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    const to = mfaRedirect(aal?.currentLevel, aal?.nextLevel, path, request.nextUrl.search);
+    if (to) {
+      const url = request.nextUrl.clone();
+      const [pathname, search] = to.split("?");
+      url.pathname = pathname ?? "/mfa";
+      url.search = search ? `?${search}` : "";
+      return NextResponse.redirect(url);
+    }
   }
   return response;
 }
